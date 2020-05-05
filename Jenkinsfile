@@ -27,6 +27,17 @@ node {
         stage('Deploye Code') {
       	println('Deployment started........')
 
+	 // -------------------------------------------------------------------------
+            // Authorize the Dev Hub org with JWT key and give it an alias.
+            // -------------------------------------------------------------------------
+
+            stage('Authorize DevHub') {
+                rc = command "${toolbelt}/sfdx force:auth:jwt:grant --instanceurl ${SFDC_HOST} --clientid ${CONNECTED_APP_CONSUMER_KEY} --username ${HUB_ORG} --jwtkeyfile ${jwt_key_file} --setdefaultdevhubusername --setalias HubOrg"
+                if (rc != 0) {
+                    error 'Salesforce dev hub org authorization failed.'
+                }
+            }
+
 	if (isUnix()) {
                 rc = sh returnStatus: true, script: "${toolbelt}sfdx force:auth:jwt:grant --clientid ${CONNECTED_APP_CONSUMER_KEY} --username ${HUB_ORG} --jwtkeyfile ${jwt_key_file} --setdefaultdevhubusername --instanceurl ${SFDC_HOST}"
             }else{
